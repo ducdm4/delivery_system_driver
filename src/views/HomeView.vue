@@ -7,7 +7,12 @@
   </div>
 
   <div class="p-3">
-    <CurrentManifest class="mt-4"></CurrentManifest>
+    <el-card class="mt-2">
+      <div class="flex justify-between items-center">
+        <span class="text-lg">Check your manifest</span>
+        <el-button @click="goToLink('/manifest')" type="success" :icon="ArrowRightBold" circle />
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -15,12 +20,17 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { employeeRoleListName } from '@/common/constant'
-import CurrentManifest from '@/components/home/CurrentManifest.vue'
+import { ArrowRightBold } from '@element-plus/icons-vue'
+import router from '@/router'
 
 const authStore = useAuthStore()
 const fullName = computed(() => {
   return `${authStore.userLoggedIn.firstName} ${authStore.userLoggedIn.lastName}`
 })
+
+function goToLink(url: string) {
+  router.push(url)
+}
 </script>
 
 <style lang="scss" scoped>

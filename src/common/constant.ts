@@ -86,3 +86,8 @@ export enum PICKUP_TYPE {
   PICKUP,
   CANCEL
 }
+
+export enum DROP_TYPE {
+  DROP,
+  CANCEL
+}

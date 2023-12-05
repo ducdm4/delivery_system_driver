@@ -5,7 +5,10 @@ import {
   collectorCancelOrderAPI,
   collectorConfirmOrderAPI,
   getCurrentManifestAPI,
-  getNewManifestAPI
+  getNewManifestAPI,
+  shipperCancelOrderAPI,
+  shipperPickedOrderAPI,
+  shipperShippedOrderAPI
 } from '@/api/orderAPI'
 
 export const useOrderStore = defineStore('order', () => {
@@ -54,6 +57,21 @@ export const useOrderStore = defineStore('order', () => {
     )
   }
 
+  async function shipperPickedOrder(payload: KeyValue) {
+    const res = await shipperPickedOrderAPI(payload)
+    return res.isSuccess
+  }
+
+  async function shipperCancelOrder(payload: KeyValue) {
+    const res = await shipperCancelOrderAPI(payload)
+    return res.isSuccess
+  }
+
+  async function shipperShippedOrder(payload: KeyValue) {
+    const res = await shipperShippedOrderAPI(payload)
+    return res.isSuccess
+  }
+
   return {
     currentManifest,
     currentManifestList,
@@ -61,6 +79,9 @@ export const useOrderStore = defineStore('order', () => {
     getNewManifest,
     collectorCancelOrder,
     removeOrderFromManifest,
-    collectorConfirmOrder
+    collectorConfirmOrder,
+    shipperPickedOrder,
+    shipperCancelOrder,
+    shipperShippedOrder
   }
 })

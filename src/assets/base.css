@@ -47,7 +47,7 @@
 
 body {
   padding-bottom: 70px;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   color: var(--color-text);
   background: var(--color-background-mute);
   transition:

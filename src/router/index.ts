@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/auth/LoginPage.vue'
+import CurrentManifest from '../views/manifest/CurrentManifest.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginPage
+    },
+    {
+      path: '/manifest',
+      name: 'current-manifest',
+      component: CurrentManifest
     }
   ]
 })
