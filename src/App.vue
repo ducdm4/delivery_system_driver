@@ -1,31 +1,70 @@
 <template>
   <RouterView />
 
-  <nav v-if="authStore.userLoggedIn.id">
+  <nav v-if="authStore.userLoggedIn?.id">
     <div><RouterLink to="/">Home</RouterLink></div>
-    <div><RouterLink to="/about">More</RouterLink></div>
+    <div><RouterLink to="/more">More</RouterLink></div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from './stores/auth'
 import router from './router'
 import { useRoute } from 'vue-router'
+import { usePhotoStore } from './stores/photo'
+import { useBroadcastChannel } from '@vueuse/core'
+import type { KeyValue } from './common/interfaces'
 
 const verified = ref(false)
 const authStore = useAuthStore()
+const photoStore = usePhotoStore()
+const { data, close } = useBroadcastChannel({
+  name: 'delivery-system-channel'
+})
+
+onBeforeUnmount(() => {
+  close()
+})
+
+watch(data, async () => {
+  const received = data.value as KeyValue
+  if (received) {
+    if (received.name === 'login') {
+      if (received.data.isSuccess) {
+        authStore.mutationUserLogin(received.data.data)
+        await handleAfterLogin(received.data.data.user)
+        router.push('/')
+      }
+    }
+  }
+})
+
+async function handleAfterLogin(res: KeyValue) {
+  console.log('res', res)
+  if (res.profilePicture) {
+    const resProfile = await photoStore.getPhotoById({ id: res.profilePicture.id })
+    if (resProfile) {
+      photoStore.mutationProfile(URL.createObjectURL(resProfile))
+    }
+  }
+}
 
 onMounted(async () => {
   const token = localStorage.getItem(import.meta.env.VITE_PUBLIC_API_KEY)
   const route = useRoute()
   if (!authStore.userLoggedIn.id && token) {
-    verified.value = await authStore.verify()
+    const res = await authStore.verify()
+    if (res) verified.value = true
     if (!verified.value) {
       router.push('/login')
-    } else if (verified.value && route.fullPath === '/login') {
-      router.push('/')
+    } else if (verified.value) {
+      if (route.fullPath === '/login') {
+        router.push('/')
+      } else {
+        await handleAfterLogin(res)
+      }
     }
   }
 })

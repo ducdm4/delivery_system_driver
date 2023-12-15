@@ -16,9 +16,10 @@ export const useOrderStore = defineStore('order', () => {
 
   const currentManifestList = computed(() => {
     if (currentManifest.value?.orders?.length) {
+      console.log('currentManifest.value?.orders?', currentManifest.value?.orders[0])
       const removeArr = currentManifest.value?.orderProcessed.map((item: { id: number }) => item.id)
-      return currentManifest.value.orders.filter((item: { id: number }) => {
-        return !removeArr.includes(item.id)
+      return currentManifest.value.orders.filter((item: { order: { id: number } }) => {
+        return !removeArr.includes(item.order.id)
       })
     }
     return []
@@ -36,7 +37,7 @@ export const useOrderStore = defineStore('order', () => {
   async function getNewManifest() {
     const res = await getNewManifestAPI()
     if (res.isSuccess) {
-      currentManifest.value = res.data
+      return res.data
     }
     return false
   }
@@ -53,7 +54,7 @@ export const useOrderStore = defineStore('order', () => {
 
   function removeOrderFromManifest(id: number) {
     currentManifest.value.orderProcessed.push(
-      currentManifest.value.orders.find((x: KeyValue) => x.id === id)
+      currentManifest.value.orders.find((x: KeyValue) => x.order.id === id)?.order
     )
   }
 

@@ -2,7 +2,7 @@
   <p class="text-[20px] text-gray-800 font-semibold">
     {{ item.order.uniqueTrackingId }}
   </p>
-  <p class="text-lg mt-2 font-semibold">{{ item.order.senderName }}</p>
+  <p class="text-lg mt-2 font-semibold">{{ senderName }}</p>
   <p class="text-[20px] text-gray-500 font-semibold">
     {{ fullTextAddress }}
   </p>
@@ -37,7 +37,7 @@
     <template v-if="!isCollector">
       <el-button
         v-if="item.status === ORDER_STATUS.ORDER_READY_TO_SHIP"
-        @click="openDialogPickup(DROP_TYPE.DROP)"
+        @click="addParcelToBasket"
         type="success"
         class="w-30"
         >Add to basket</el-button
@@ -75,7 +75,7 @@ const props = defineProps<{
 const imageList = ref([] as Array<string>)
 const photoStore = usePhotoStore()
 const authStore = useAuthStore()
-const emit = defineEmits(['openProcessDialog'])
+const emit = defineEmits(['openProcessDialog', 'addParcelToBasket'])
 
 onMounted(async () => {
   for (let i = 0; i < props.item.order.parcels.length; i++) {
@@ -92,19 +92,36 @@ const isCollector = computed(() => {
   return authStore.userLoggedIn.role === ROLE_LIST.COLLECTOR
 })
 
+const senderName = computed(() => {
+  return props.item.status === ORDER_STATUS.WAITING_COLLECTOR_TO_TRANSIT
+    ? props.item.previousStationInCharge?.name
+    : props.item.order.senderName
+})
+
 const fullTextAddress = computed(() => {
-  const key = isCollector.value ? 'pickupAddress' : 'dropOffAddress'
+  let address = {} as KeyValue
+  if (!isCollector.value) {
+    address = props.item.order.dropOffAddress
+  } else {
+    address =
+      props.item.status === ORDER_STATUS.WAITING_COLLECTOR_TO_TRANSIT
+        ? props.item.previousStationInCharge?.address
+        : props.item.order.pickupAddress
+  }
   let res = []
-  if (props.item.order[key].building) {
-    res.push(props.item.order[key].building)
+  if (address) {
+    if (address?.building) {
+      res.push(address.building)
+    }
+    if (address?.detail) {
+      res.push(address.detail)
+    }
+    res.push(address.street?.name)
+    res.push(address.ward?.name)
+    res.push(address.district?.name)
+    res.push(address.city?.name)
   }
-  if (props.item.order[key].detail) {
-    res.push(props.item.order[key].detail)
-  }
-  res.push(props.item.order[key].street.name)
-  res.push(props.item.order[key].ward.name)
-  res.push(props.item.order[key].district.name)
-  res.push(props.item.order[key].city.name)
+
   return res.join(', ')
 })
 
@@ -118,5 +135,12 @@ function direction() {
 
 function openDialogPickup(type: number) {
   emit('openProcessDialog', props.item, type)
+}
+
+function addParcelToBasket() {
+  const payload = {
+    trackingId: props.item.order.uniqueTrackingId
+  }
+  emit('addParcelToBasket', payload)
 }
 </script>

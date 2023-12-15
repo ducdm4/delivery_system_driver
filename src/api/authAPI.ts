@@ -2,6 +2,7 @@ import type { KeyValue } from '@/common/interfaces'
 import { useAPI } from '../common/fetch'
 
 export async function login(userInfo: KeyValue) {
+  console.log('ducdm')
   const response = await useAPI(
     {
       url: `auth/login`,

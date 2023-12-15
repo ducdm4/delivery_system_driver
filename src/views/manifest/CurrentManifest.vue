@@ -21,20 +21,35 @@
         </template>
 
         <div class="order-container" v-else>
-          <div class="text-center">
+          <p class="font-semibold text-lg text-gray-500">
+            Processed: {{ orderStore.currentManifest?.orderProcessed.length }} /
+            {{ orderStore.currentManifest?.orders.length }} order(s)
+          </p>
+          <div
+            v-if="!isCollector && orderStore.currentManifestList?.length"
+            class="text-center mt-5"
+          >
             <el-button @click="isOpenDialogScanner = true" type="warning" :icon="Camera"
               >Add order by Barcode</el-button
             >
           </div>
         </div>
       </el-card>
-      <div v-if="orderStore.currentManifestList?.length" class="mt-36">
+
+      <div
+        v-if="orderStore.currentManifestList?.length"
+        :class="{ 'mt-36': isCollector, 'mt-48': !isCollector }"
+      >
         <el-card
           v-for="(item, index) in orderStore.currentManifestList"
           :key="`${customKey}-${index}`"
           class="border rounded mb-4"
         >
-          <ManifestItem @openProcessDialog="openProcessDialog" :item="item"></ManifestItem>
+          <ManifestItem
+            @addParcelToBasket="addParcelProcess"
+            @openProcessDialog="openProcessDialog"
+            :item="item"
+          ></ManifestItem>
         </el-card>
       </div>
 
@@ -167,8 +182,16 @@ const isCollector = computed(() => {
 })
 
 async function getNewManifest() {
-  await orderStore.getNewManifest()
-  await orderStore.getCurrentManifest()
+  const res = await orderStore.getNewManifest()
+  if (res) {
+    await orderStore.getCurrentManifest()
+  } else {
+    ElNotification({
+      title: `Failed`,
+      message: `There is no order available at this time, please try again later`,
+      type: 'error'
+    })
+  }
 }
 
 function onLoaded(e: any) {}
@@ -255,11 +278,15 @@ async function addToBasket() {
     const payload = {
       trackingId: barcodeScanned.value
     }
-    const res = await orderStore.shipperPickedOrder(payload)
-    if (res) {
-      await orderStore.getCurrentManifest()
-      handleCloseScanDialog()
-    }
+    addParcelProcess(payload)
+  }
+}
+
+async function addParcelProcess(payload: KeyValue) {
+  const res = await orderStore.shipperPickedOrder(payload)
+  if (res) {
+    await orderStore.getCurrentManifest()
+    handleCloseScanDialog()
   }
 }
 
@@ -294,7 +321,7 @@ async function submitProcess() {
     }
 
     if (res) {
-      orderStore.removeOrderFromManifest(dialogData.value.id)
+      orderStore.removeOrderFromManifest(dialogData.value.order.id)
       handleCloseProcessDialog()
       const text = popupInfo.value.type === PICKUP_TYPE.PICKUP ? 'confirmed' : 'cancelled'
       const textDrop = popupInfo.value.type === DROP_TYPE.DROP ? 'shipped' : 'cancelled'
@@ -316,7 +343,7 @@ function handleSelectImage(file: UploadFile) {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .overlay-element {
+:deep .overlay-element {
   position: absolute;
   top: 0;
   width: 100%;
@@ -348,7 +375,7 @@ function handleSelectImage(file: UploadFile) {
   );
 }
 
-::v-deep .laser {
+:deep .laser {
   width: 80%;
   margin-left: 10%;
   background-color: tomato;

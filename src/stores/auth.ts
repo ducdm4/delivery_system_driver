@@ -1,32 +1,42 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login, verifyUser } from '@/api/authAPI'
+import { verifyUser, login } from '@/api/authAPI'
 import type { KeyValue } from '@/common/interfaces'
 
 export const useAuthStore = defineStore('auth', () => {
   const count = ref(0)
   const userLoggedIn = ref({} as KeyValue)
 
-  const doubleCount = computed(() => count.value * 2)
+  async function mutationUserLogin(data: KeyValue) {
+    userLoggedIn.value = data.user
+    console.log('userLoggedIn.value', userLoggedIn.value)
+    localStorage.setItem(import.meta.env.VITE_PUBLIC_API_KEY, data.tokens.accessToken)
+  }
 
   async function doLogin(data: KeyValue) {
     const res = await login(data)
     if (res.isSuccess) {
       userLoggedIn.value = res.data.user
       localStorage.setItem(import.meta.env.VITE_PUBLIC_API_KEY, res.data.tokens.accessToken)
-      return true
+      return res.data.user
     }
     return false
+  }
+
+  async function logout() {
+    localStorage.removeItem(import.meta.env.VITE_PUBLIC_API_KEY)
+    userLoggedIn.value = {}
+    return true
   }
 
   async function verify() {
     const res = await verifyUser()
     if (res.isSuccess) {
       userLoggedIn.value = res.data
-      return true
+      return res.data
     }
-    return false
+    return null
   }
 
-  return { count, doubleCount, verify, doLogin, userLoggedIn }
+  return { count, verify, mutationUserLogin, userLoggedIn, logout, doLogin }
 })

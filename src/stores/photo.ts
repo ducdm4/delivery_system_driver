@@ -4,6 +4,12 @@ import type { KeyValue } from '@/common/interfaces'
 import { addNewPhoto, getPhotoByIdAPI } from '@/api/photoAPI'
 
 export const usePhotoStore = defineStore('photo', () => {
+  const profileImage = ref('')
+
+  function mutationProfile(url: string) {
+    profileImage.value = url
+  }
+
   async function getPhotoById(data: KeyValue) {
     const res = await getPhotoByIdAPI(data)
     if (res.isSuccess) {
@@ -20,5 +26,5 @@ export const usePhotoStore = defineStore('photo', () => {
     return false
   }
 
-  return { getPhotoById, uploadNewPhoto }
+  return { getPhotoById, uploadNewPhoto, mutationProfile, profileImage }
 })
