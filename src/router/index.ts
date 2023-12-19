@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-//@ts-ignore
-import LoginPage from 'delivery-system-service/LoginPage'
+import LoginPage from '../views/auth/LoginPage.vue'
 import CurrentManifest from '../views/manifest/CurrentManifest.vue'
 import MoreMenu from '../views/menu/MoreMenu.vue'
 import MainProfile from '../views/user/MainProfile.vue'

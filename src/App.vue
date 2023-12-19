@@ -2,8 +2,21 @@
   <RouterView />
 
   <nav v-if="authStore.userLoggedIn?.id">
-    <div><RouterLink to="/">Home</RouterLink></div>
-    <div><RouterLink to="/more">More</RouterLink></div>
+    <div>
+      <RouterLink to="/"
+        ><el-icon size="25"><House /></el-icon
+      ></RouterLink>
+    </div>
+    <div>
+      <RouterLink to="/notifications"
+        ><el-icon size="25"><Bell /></el-icon
+      ></RouterLink>
+    </div>
+    <div>
+      <RouterLink to="/more"
+        ><el-icon size="25"><More /></el-icon
+      ></RouterLink>
+    </div>
   </nav>
 </template>
 
@@ -72,7 +85,7 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 nav {
-  @apply fixed bottom-0 w-full grid grid-cols-2 justify-between bg-white h-16 border-t-2;
+  @apply fixed bottom-0 w-full grid-cols-3 grid w-full bg-white h-16 border-t-2;
   div {
     @apply flex items-center justify-center text-lg;
   }
