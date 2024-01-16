@@ -15,6 +15,7 @@
               @click="getNewManifest"
               type="primary"
               round
+              :loading="loading"
               >Create manifest</el-button
             >
           </div>
@@ -168,9 +169,14 @@ const reasonListDrop = [
 const customKey = ref(0)
 const barcodeScanned = ref('')
 const errorBarcodeScan = ref('')
+const loading = ref(false)
 
 onMounted(async () => {
-  await orderStore.getCurrentManifest()
+  console.log('orderStore.currentManifestList.value', orderStore.currentManifestList.length)
+  console.log('orderStore.currentManifestList.value2', orderStore.currentManifest.id)
+  if (!orderStore.currentManifestList.length) {
+    await orderStore.getCurrentManifest()
+  }
 })
 
 const reasonListDisplay = computed(() => {
@@ -182,7 +188,9 @@ const isCollector = computed(() => {
 })
 
 async function getNewManifest() {
+  loading.value = true
   const res = await orderStore.getNewManifest()
+  loading.value = false
   if (res) {
     await orderStore.getCurrentManifest()
   } else {
@@ -392,6 +400,9 @@ function handleSelectImage(file: UploadFile) {
 </style>
 
 <style lang="scss">
+.slideunlock .slideunlock-text {
+  font-size: 1rem !important;
+}
 .proof-uploader .el-upload {
   border: 1px dashed var(--el-border-color);
   border-radius: 6px;

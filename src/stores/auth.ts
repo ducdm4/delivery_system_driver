@@ -4,11 +4,10 @@ import { verifyUser, login } from '@/api/authAPI'
 import type { KeyValue } from '@/common/interfaces'
 
 export const useAuthStore = defineStore('auth', () => {
-  const count = ref(0)
   const userLoggedIn = ref({} as KeyValue)
 
   async function mutationUserLogin(data: KeyValue) {
-    userLoggedIn.value = data.user
+    userLoggedIn.value = Object.assign({}, data.user)
     console.log('userLoggedIn.value', userLoggedIn.value)
     localStorage.setItem(import.meta.env.VITE_PUBLIC_API_KEY, data.tokens.accessToken)
   }
@@ -32,11 +31,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function verify() {
     const res = await verifyUser()
     if (res.isSuccess) {
-      userLoggedIn.value = res.data
+      userLoggedIn.value = Object.assign({}, res.data)
       return res.data
     }
     return null
   }
 
-  return { count, verify, mutationUserLogin, userLoggedIn, logout, doLogin }
+  return { verify, mutationUserLogin, userLoggedIn, logout, doLogin }
 })
