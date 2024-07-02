@@ -1,18 +1,20 @@
 <template>
   <RouterView />
 
-  <nav v-if="authStore.userLoggedIn?.id">
-    <div>
-      <RouterLink to="/"
-        ><el-icon size="25"><House /></el-icon
-      ></RouterLink>
-    </div>
-    <div>
-      <RouterLink to="/more"
-        ><el-icon size="25"><More /></el-icon
-      ></RouterLink>
-    </div>
-  </nav>
+  <KeepAlive>
+    <nav v-if="authStore.userLoggedIn?.id">
+      <div>
+        <RouterLink to="/"
+          ><el-icon size="25"><House /></el-icon
+        ></RouterLink>
+      </div>
+      <div>
+        <RouterLink to="/more"
+          ><el-icon size="25"><More /></el-icon
+        ></RouterLink>
+      </div>
+    </nav>
+  </KeepAlive>
 
   <CallScreen v-if="callInfo.isShowDialog" />
 </template>
@@ -42,7 +44,8 @@ const { data, close } = useBroadcastChannel({
 })
 const userStore = useUserStore()
 const orderStore = useOrderStore()
-const callInfo = ref({ isShowDialog: false })
+const callInfo = ref({ isShowDialog: false, trackingId: '' })
+const callInstance = ref(null as any)
 
 onBeforeUnmount(() => {
   close()
@@ -122,6 +125,7 @@ onMounted(async () => {
       ) > -1
     ) {
       console.log('peer2', peer)
+      callInfo.value.trackingId = data.trackingId
       socket.emit('shipperWantJoinCall', {
         instanceId: socket.id,
         roomName: data.roomName,
@@ -133,25 +137,30 @@ onMounted(async () => {
   console.log('peerpeerpeer', peer)
   peer.on('call', (call) => {
     console.log('receive call', call)
-    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(
-      (stream) => {
-        call.answer(stream) // Answer the call with an A/V stream.
-        // const videoId = document.getElementById('video-call') as HTMLVideoElement
-        // if (videoId) {
-        //   videoId.srcObject = stream
-        // }
-        // call.on('stream', (remoteStream) => {
-        //   // Show stream in some <video> element.
-        //   const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
-        //   if (videoRemoteId) {
-        //     videoRemoteId.srcObject = remoteStream
-        //   }
-        // })
-      },
-      (err) => {
-        console.error('Failed to get local stream', err)
-      }
+    callInstance.value = call
+    callInfo.value.isShowDialog = true
+    const orderInfo = orderStore.currentManifestList.find(
+      (x: KeyValue) => x.order.uniqueTrackingId === callInfo.value.trackingId.toString()
     )
+    // navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(
+    //   (stream) => {
+    //     call.answer(stream) // Answer the call with an A/V stream.
+    //     const videoId = document.getElementById('video-call') as HTMLVideoElement
+    //     if (videoId) {
+    //       videoId.srcObject = stream
+    //     }
+    //     call.on('stream', (remoteStream) => {
+    //       // Show stream in some <video> element.
+    //       const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
+    //       if (videoRemoteId) {
+    //         videoRemoteId.srcObject = remoteStream
+    //       }
+    //     })
+    //   },
+    //   (err) => {
+    //     console.error('Failed to get local stream', err)
+    //   }
+    // )
   })
 
   console.log('socket', socket.id)

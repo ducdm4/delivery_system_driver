@@ -42,7 +42,7 @@ export default defineConfig({
     federation({
       name: 'delivery-system-driver',
       remotes: {
-        'delivery-system-service': 'http://192.168.1.19:5174/assets/remoteEntry.js'
+        'delivery-system-service': 'http://192.168.1.8:5174/assets/remoteEntry.js'
       },
       shared: ['vue']
     })

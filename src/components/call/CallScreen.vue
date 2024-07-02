@@ -13,11 +13,10 @@
       <div class="mt-10">
         <p class="text-center font-bold mb-6 text-lg">Delivery info</p>
         <p class="font-semibold text-red-500">
-          <span class="text-sm text-gray-500">Tracking ID:</span> 23453523453425
+          <span class="text-sm text-gray-500">Tracking ID:</span> {{ orderInfo.trackingID }}
         </p>
         <p class="font-semibold">
-          <span class="text-sm text-gray-500">Recipient address:</span> so 21, nguyen huy tuong,
-          thanh xuan trung, thanh xuan
+          <span class="text-sm text-gray-500">Recipient address:</span> {{ orderInfo.address }}
         </p>
       </div>
 
@@ -35,6 +34,17 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const threeDot = ref<InstanceType<typeof HTMLSpanElement> | null>(null)
 const interval = ref(0)
+
+const props = defineProps({
+  orderInfo: {
+    type: Object,
+    required: true,
+    default: () => ({
+      trackingID: '',
+      address: ''
+    })
+  }
+})
 
 onMounted(() => {
   interval.value = setInterval(() => {

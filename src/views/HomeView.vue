@@ -31,7 +31,7 @@ import { useAuthStore } from '@/stores/auth'
 import { employeeRoleListName } from '@/common/constant'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import router from '@/router'
-import peer from '@/common/plugin/peer'
+// import peer from '@/common/plugin/peer'
 
 const authStore = useAuthStore()
 const fullName = computed(() => {
@@ -43,10 +43,10 @@ const videoContainer = ref<HTMLVideoElement>()
 const answerVideoContainer = ref<HTMLVideoElement>()
 
 function connectToPeer() {
-  const conn = peer.connect(peerConnect.value)
-  conn.on('open', () => {
-    conn.send('hi!')
-  })
+  // const conn = peer.connect(peerConnect.value)
+  // conn.on('open', () => {
+  //   conn.send('hi!')
+  // })
 }
 
 function goToLink(url: string) {
@@ -56,28 +56,28 @@ function goToLink(url: string) {
 function answerCall() {}
 
 function videoCall() {
-  const getMedia = navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  getMedia.then(
-    (stream) => {
-      const videoId = document.getElementById('video-call') as HTMLVideoElement
-      if (videoId) {
-        videoId.srcObject = stream
-      }
-      const call = peer.call(peerConnect.value, stream)
-      call.on('stream', (localStream) => {
-        console.log('localStream', localStream)
-        // Show stream in some <video> element.
-        const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
-        if (videoRemoteId) {
-          videoRemoteId.srcObject = stream
-        }
-        // videoContainer.value!.srcObject = remoteStream
-      })
-    },
-    (err) => {
-      console.error('Failed to get local stream', err)
-    }
-  )
+  // const getMedia = navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  // getMedia.then(
+  //   (stream) => {
+  //     const videoId = document.getElementById('video-call') as HTMLVideoElement
+  //     if (videoId) {
+  //       videoId.srcObject = stream
+  //     }
+  //     const call = peer.call(peerConnect.value, stream)
+  //     call.on('stream', (localStream) => {
+  //       console.log('localStream', localStream)
+  //       // Show stream in some <video> element.
+  //       const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
+  //       if (videoRemoteId) {
+  //         videoRemoteId.srcObject = stream
+  //       }
+  //       // videoContainer.value!.srcObject = remoteStream
+  //     })
+  //   },
+  //   (err) => {
+  //     console.error('Failed to get local stream', err)
+  //   }
+  // )
 }
 // }
 
@@ -102,8 +102,7 @@ function videoCall() {
 // }
 
 onMounted(() => {
-  console.log('peer', peer)
-
+  // console.log('peer homeview', peer)
   // peer.on('connection', (conn) => {
   //   console.log('fasdf', conn)
   //   conn.on('data', (data) => {
@@ -116,29 +115,33 @@ onMounted(() => {
   //     conn.send('hello!')
   //   })
   // })
-
-  // peer.on('call', (call) => {
-  //   console.log('receive call', call)
-  //   navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(
-  //     (stream) => {
-  //       call.answer(stream) // Answer the call with an A/V stream.
-  //       const videoId = document.getElementById('video-call') as HTMLVideoElement
-  //       if (videoId) {
-  //         videoId.srcObject = stream
-  //       }
-  //       call.on('stream', (remoteStream) => {
-  //         // Show stream in some <video> element.
-  //         const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
-  //         if (videoRemoteId) {
-  //           videoRemoteId.srcObject = remoteStream
-  //         }
-  //       })
-  //     },
-  //     (err) => {
-  //       console.error('Failed to get local stream', err)
+  // setTimeout(() => {
+  //   peer.on('error', (err) => {
+  //     console.log(err)
+  //   })
+  //   peer.on('call', (call) => {
+  //     console.log('receive call', call)
+  // navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(
+  //   (stream) => {
+  //     call.answer(stream) // Answer the call with an A/V stream.
+  //     const videoId = document.getElementById('video-call') as HTMLVideoElement
+  //     if (videoId) {
+  //       videoId.srcObject = stream
   //     }
-  //   )
-  // })
+  //     call.on('stream', (remoteStream) => {
+  //       // Show stream in some <video> element.
+  //       const videoRemoteId = document.getElementById('video-answer-call') as HTMLVideoElement
+  //       if (videoRemoteId) {
+  //         videoRemoteId.srcObject = remoteStream
+  //       }
+  //     })
+  //   },
+  //   (err) => {
+  //     console.error('Failed to get local stream', err)
+  //   }
+  // )
+  //   })
+  // }, 1000)
 })
 </script>
 
